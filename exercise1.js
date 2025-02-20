@@ -21,6 +21,25 @@ const yardsBuilderCallback = (yargs, type = "boolean") => {
     });
 };
 
+const setDatetime = (argv, operation) => {
+  const multiplier = operation === "+" ? 1 : -1;
+  const newDate = new Date();
+  if (argv.year) {
+    const currentYear = argv.datetime.getFullYear();
+    newDate.setFullYear(currentYear + multiplier * argv.year);
+  }
+  if (argv.month) {
+    const currentMonth = newDate.getMonth();
+    newDate.setMonth(currentMonth + multiplier * argv.month);
+  }
+  if (argv.date) {
+    const currentDay = newDate.getDate();
+    newDate.setDate(currentDay + multiplier * argv.date);
+  }
+
+  return newDate;
+};
+
 const argv = yargs(hideBin(process.argv))
   .command(
     "current",
@@ -48,19 +67,7 @@ const argv = yargs(hideBin(process.argv))
     false,
     (yargs) => yardsBuilderCallback(yargs, "number"),
     (argv) => {
-      argv.datetime = new Date();
-      if (argv.year) {
-        const currentYear = argv.datetime.getFullYear();
-        argv.datetime.setFullYear(currentYear + argv.year);
-      }
-      if (argv.month) {
-        const currentMonth = argv.datetime.getMonth();
-        argv.datetime.setMonth(currentMonth + argv.month);
-      }
-      if (argv.date) {
-        const currentDay = argv.datetime.getDate();
-        argv.datetime.setDate(currentDay + argv.date);
-      }
+      argv.datetime = setDatetime(argv, "+");
     }
   )
   .command(
@@ -68,19 +75,7 @@ const argv = yargs(hideBin(process.argv))
     false,
     (yargs) => yardsBuilderCallback(yargs, "number"),
     (argv) => {
-      argv.datetime = new Date();
-      if (argv.date) {
-        const currentDay = argv.datetime.getDate();
-        argv.datetime.setDate(currentDay - argv.date);
-      }
-      if (argv.month) {
-        const currentMonth = argv.datetime.getMonth();
-        argv.datetime.setMonth(currentMonth - argv.month);
-      }
-      if (argv.year) {
-        const currentYear = argv.datetime.getFullYear();
-        argv.datetime.setFullYear(currentYear - argv.year);
-      }
+      argv.datetime = argv.datetime = setDatetime(argv, "-");
     }
   ).argv;
 
