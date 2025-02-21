@@ -2,22 +2,22 @@
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 
-const yardsBuilderCallback = (yargs, type = "boolean") => {
+const yardsBuilderCallback = (yargs, type = "boolean", default = false) => {
   return yargs
     .option("year", {
       alias: "y",
       type,
-      default: false,
+      default,
     })
     .option("month", {
       alias: "m",
       type,
-      default: false,
+      default,
     })
     .option("date", {
       alias: "d",
       type,
-      default: false,
+      default,
     });
 };
 
@@ -44,7 +44,7 @@ const argv = yargs(hideBin(process.argv))
   .command(
     "current",
     false,
-    (yargs) => yardsBuilderCallback(yargs, "boolean"),
+    (yargs) => yardsBuilderCallback(yargs),
     (argv) => {
       const currentDate = new Date();
       argv.datetime = currentDate;
@@ -65,7 +65,7 @@ const argv = yargs(hideBin(process.argv))
   .command(
     "add",
     false,
-    (yargs) => yardsBuilderCallback(yargs, "number"),
+    (yargs) => yardsBuilderCallback(yargs, "number", 0),
     (argv) => {
       argv.datetime = setDatetime(argv, "+");
     }
