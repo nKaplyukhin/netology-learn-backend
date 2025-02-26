@@ -18,8 +18,6 @@ const parseGameDataToList = (data) => {
 
 
 const getGameInfo = (dataList) => {
-  console.log(dataList);
-  
   const gamesCount = dataList.length;
   const gamesWinCount = dataList.filter(item => item.includes("Выйграл")).length
   const gamesLooseCount = dataList.filter(item => item.includes("Проиграл")).length
