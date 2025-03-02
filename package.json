@@ -1,15 +1,33 @@
 {
-  "name": "webgl",
+  "name": "netology-learn-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "exercise1.js",
+  "dependencies": {
+    "cliui": "^8.0.1",
+    "escalade": "^3.2.0",
+    "get-caller-file": "^2.0.5",
+    "require-directory": "^2.1.1",
+    "string-width": "^4.2.3",
+    "y18n": "^5.0.8",
+    "yargs": "^17.7.2",
+    "yargs-parser": "^21.1.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node -r dotenv/config exercise1.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nKaplyukhin/netology-learn-backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "yargs": "^17.7.2"
-  }
+  "bugs": {
+    "url": "https://github.com/nKaplyukhin/netology-learn-backend/issues"
+  },
+  "homepage": "https://github.com/nKaplyukhin/netology-learn-backend#readme",
+  "description": ""
 }
