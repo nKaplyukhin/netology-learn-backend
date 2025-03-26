@@ -5,7 +5,7 @@ const { isNotDefined } = require("./common");
 
 const app = express();
 const port = process.env.PORT || 5000;
-
+app.set('view engine', 'ejs');
 
 const stor = {
   users: [
@@ -16,8 +16,8 @@ const stor = {
   ],
 };
 
-app.use(express.json());
-app.use("/api/books", bookRouter);
+app.use(express.urlencoded({ extended: true }));
+app.use("/books", bookRouter);
 
 app.post("/api/user/login", (req, res) => {
   const { login, password } = req.body;

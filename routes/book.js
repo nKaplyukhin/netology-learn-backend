@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require("uuid");
 const express = require("express");
 const uploadFile = require("../middlewares/upload-book");
 const fs = require("fs");
-const { booksFilePath, isNotDefined } = require("../common");
+const { booksFilePath } = require("../common");
+const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ class Book {
     title = "",
     descriptrion = "",
     authors = "",
-    favorite = "",
+    favorite = false,
     fileCover = "",
     fileName = "",
     fileBook = "",
@@ -32,7 +32,8 @@ const stor = {
   books: [
     new Book({
       title: "book1",
-      fileBook: "1742101789791-book.json",
+      fileName: "1742101789791-book.json",
+      favorite: true
     }),
     new Book({
       title: "book2",
@@ -43,20 +44,54 @@ const stor = {
 router.get("/", (req, res) => {
   const { books } = stor;
 
-  res.json(books);
+  res.render('index', { title: 'Главная', books });
 });
 
-router.get("/:id", (req, res) => {
+router.get("/info/:id", (req, res) => {
   const { books } = stor;
   const { id } = req.params;
 
   const book = books.find((item) => item.id === id);
 
   if (!book) {
-    return isNotDefined(res, "404 | Книга не найдена");
+    res.status(404).render("error", { title: "Ошибка" });
+    return
   }
 
-  res.json(book);
+  res.render("book-view", { title: book.title, book });
+});
+
+
+router.get("/edit/:id", (req, res) => {
+  const { books } = stor;
+  const { id } = req.params;
+
+  const book = books.find((item) => item.id === id);
+
+  if (!book) {
+    res.status(404).render("error", { title: "Ошибка" });
+    return
+  }
+
+  res.render("book-edit", { title: 'Редактирование', book });
+});
+
+router.post("/edit/:id", (req, res) => {
+  const { id } = req.params;
+  const { books } = stor;
+  const params = req.body;
+
+  const idx = books.findIndex((item) => item.id === id);
+
+  if (idx === -1) {
+    res.status(404).render("error", { title: "Ошибка" });
+    return
+  }
+
+  books[idx] = { ...books[idx], ...params, favorite: !!params.favorite || false };
+
+  res.status(201);
+  res.redirect(`/books/info/${books[idx].id}`)
 });
 
 router.get("/:id/download", (req, res) => {
@@ -64,78 +99,73 @@ router.get("/:id/download", (req, res) => {
   const { books } = stor;
 
   const book = books.find((item) => item.id === id);
-  console.log(id, book);
 
   if (!book) {
-    return isNotDefined(res, "404 | Книга не найдена");
+    res.status(404).render("error", { title: "Ошибка" });
+    return
   }
 
-  const { fileBook } = book;
+  const { fileName } = book;
 
-  res.download(booksFilePath + "/" + fileBook, fileBook, (err) => {
+  res.download(booksFilePath + "/" + fileName, fileName, (err) => {
     if (err) {
       res.status(404).json(err);
     }
   });
 });
 
-router.post("/", (req, res) => {
+router.post("/create", (req, res) => {
   const params = req.body;
-  const newBook = new Book(params);
+  const newBook = new Book({ ...params, favorite: !!params.favorite || false });
 
   res.status(201);
   stor.books.push(newBook);
-  res.json(newBook);
+  res.redirect("/books")
 });
 
-router.post("/upload-book", uploadFile.single("book"), (req, res) => {
+router.get("/create", (req, res) => {
+  res.render('book-create', { title: 'Главная', book: {} });
+});
+
+router.post("/upload", uploadFile.single("book"), (req, res) => {
+
   if (req.file) {
-    const { filename, path } = req.file;
+    const { filename, path, } = req.file;
 
     const buffer = fs.readFileSync(path);
 
     if (buffer) {
       const bookData = JSON.parse(buffer);
-      const newBook = new Book({ ...bookData, fileBook: filename });
+      const newBook = new Book({ ...bookData, fileName: filename, fileBook: path });
 
       stor.books.push(newBook);
 
-      res.status(201).json(newBook);
+      res.status(201).redirect("/books");
       return;
     }
   }
-  res.status(404).json("Произошла ошибка");
+  res.status(404).render("error", { title: "Ошибка" });
 });
 
-router.put("/:id", (req, res) => {
-  const { id } = req.params;
-  const { books } = stor;
-  const params = req.body;
+router.get("/upload", uploadFile.single("book"), (req, res) => {
 
-  const idx = books.findIndex((item) => item.id === id);
-
-  if (idx === -1) {
-    return isNotDefined(res, "404 | Книга не найдена");
-  }
-
-  books[idx] = { ...books[idx], ...params };
-
-  res.json(books[idx]);
+  res.render('book-upload', { title: 'Главная', book: {} });
 });
 
-router.delete("/:id", (req, res) => {
+router.post("/delete/:id", (req, res) => {
   const { id } = req.params;
   const { books } = stor;
 
   const idx = books.findIndex((item) => item.id === id);
 
   if (idx === -1) {
-    return isNotDefined(res, "404 | Книга не найдена");
+    res.status(404).render("error", { title: "Ошибка" });
+    return
   }
 
   books.splice(idx, 1);
 
-  res.json("ok");
+  res.redirect("/books")
 });
 
 module.exports = {

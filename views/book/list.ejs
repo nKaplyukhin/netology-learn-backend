@@ -1,0 +1,5 @@
+<ul class="d-flex flex-wrap gap-3 px-0">
+  <% books.forEach(book => { %>
+    <%- include('./item', {book}) %>
+  <% }) %>
+</ul>

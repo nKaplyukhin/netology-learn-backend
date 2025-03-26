@@ -2,5 +2,7 @@
   "title": "string",
   "description": "string",
   "authors": "string",
-  "favorite": true
+  "fileCover": "string",
+  "fileName": "string",
+  "fileBook": "string"
 }
