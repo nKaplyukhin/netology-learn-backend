@@ -1,0 +1,35 @@
+1-  docker pull node:15.14
+        15.14: Pulling from library/node
+        55fab5cadd3c: Pull complete
+        4b57d41e8391: Pull complete
+        bd821d20ef8c: Pull complete
+        6041b69671c6: Pull complete
+        989c5d2d2313: Pull complete
+        Digest: sha256:608bba799613b1ebf754034ae008849ba51e88b23271412427b76d60ae0d0627
+        Status: Downloaded newer image for node:15.14
+        docker.io/library/node:15.14
+
+2-  docker run --name first_node -i -t -d -v C:\projects\netology-learn-backend\data:/var/first/data node:15.14 
+        714545ec3e9f6de970085515b0abb6278d38b61ae37ad42c778bc4d24cbc637e
+
+3-  docker run --name second_node -i -t -d -v C:\projects\netology-learn-backend\data:/var/second/data node:15.14
+        cc99747a65f9c4109703020560ab8bfbfd88b74ecff1c8045e5a83f93d3cd806
+
+4-   docker exec -it first_node sh -c "echo 'Это текст внутри первого файла' > /var/first/data/file.txt"
+
+5-   wsl echo 'host-file' > .\data\host-file.txt   
+
+6-  docker exec second_node ls -l /var/second/data
+        total 0
+        -rw-r--r-- 1 root root 57 Apr  3 15:16 file.txt
+        -rwxrwxrwx 1 root root 24 Apr  3 15:17 host-file.txt
+
+7-  docker stop first_node
+    docker stop second_node
+
+8-  docker rm -f first_node
+    docker rm -f second_node
+
+9-  docker rmi -f node:15.14
+        Untagged: node:15.14
+        Deleted: sha256:608bba799613b1ebf754034ae008849ba51e88b23271412427b76d60ae0d0627

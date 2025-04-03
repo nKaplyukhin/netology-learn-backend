@@ -1,0 +1,24 @@
+1-  docker pull node:15.14
+        15.14: Pulling from library/node
+        55fab5cadd3c: Pull complete
+        4b57d41e8391: Pull complete
+        bd821d20ef8c: Pull complete
+        6041b69671c6: Pull complete
+        989c5d2d2313: Pull complete
+        Digest: sha256:608bba799613b1ebf754034ae008849ba51e88b23271412427b76d60ae0d0627
+        Status: Downloaded newer image for node:15.14
+        docker.io/library/node:15.14
+
+2-  docker run --env NAME=Nikita --env SURNAME=Kaplyukhin --name mynode -i -t -d  node:15.14     
+        dc9d8805de4d8fe93781c0d9afbced1b8b67a516fe753dcb1d859e5638eed795
+
+3-   docker exec -i mynode node -e "console.log('Привет, ' + (process.env.NAME || 'Неизвестное имя') + ' ' + (process.env.SURNAME || 'Неизвестная фамилия') + '!');"
+        Привет, Nikita Kaplyukhin!
+
+4-  docker stop mynode
+        mynode
+5-  docker rm -f mynode
+        mynode
+    docker rmi -f node:15.14
+        Untagged: node:15.14
+        Deleted: sha256:608bba799613b1ebf754034ae008849ba51e88b23271412427b76d60ae0d0627

@@ -1,0 +1,91 @@
+1-  docker pull busybox
+        Using default tag: latest
+        latest: Pulling from library/busybox
+        97e70d161e81: Pull complete
+        Digest: sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
+        Status: Downloaded newer image for busybox:latest
+        docker.io/library/busybox:latest
+
+2-  docker run --name pinger -i -t busybox ping -c 7 netology.ru
+        PING netology.ru (51.250.51.8): 56 data bytes
+        64 bytes from 51.250.51.8: seq=0 ttl=63 time=58.363 ms
+        64 bytes from 51.250.51.8: seq=1 ttl=63 time=58.049 ms
+        64 bytes from 51.250.51.8: seq=2 ttl=63 time=62.162 ms
+        64 bytes from 51.250.51.8: seq=3 ttl=63 time=61.933 ms
+        64 bytes from 51.250.51.8: seq=4 ttl=63 time=61.641 ms
+        64 bytes from 51.250.51.8: seq=5 ttl=63 time=57.719 ms
+        64 bytes from 51.250.51.8: seq=6 ttl=63 time=61.537 ms
+        --- netology.ru ping statistics ---
+        7 packets transmitted, 7 packets received, 0% packet loss
+        round-trip min/avg/max = 57.719/60.200/62.162 ms
+
+3-  docker ps -a
+        CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS                      PORTS     NAMES
+        269ea743513b   busybox   "ping -c 7 netology.…"   30 seconds ago   Exited (0) 24 seconds ago             pinger
+
+4-  docker logs pinger
+        PING netology.ru (51.250.51.8): 56 data bytes
+        64 bytes from 51.250.51.8: seq=0 ttl=63 time=58.363 ms
+        64 bytes from 51.250.51.8: seq=1 ttl=63 time=58.049 ms
+        64 bytes from 51.250.51.8: seq=2 ttl=63 time=62.162 ms
+        64 bytes from 51.250.51.8: seq=3 ttl=63 time=61.933 ms
+        64 bytes from 51.250.51.8: seq=4 ttl=63 time=61.641 ms
+        64 bytes from 51.250.51.8: seq=5 ttl=63 time=57.719 ms
+        64 bytes from 51.250.51.8: seq=6 ttl=63 time=61.537 ms
+        --- netology.ru ping statistics ---
+        7 packets transmitted, 7 packets received, 0% packet loss
+        round-trip min/avg/max = 57.719/60.200/62.162 ms
+
+5-  docker start pinger -i
+        PING netology.ru (51.250.51.8): 56 data bytes
+        64 bytes from 51.250.51.8: seq=0 ttl=63 time=55.508 ms
+        64 bytes from 51.250.51.8: seq=1 ttl=63 time=61.135 ms
+        64 bytes from 51.250.51.8: seq=2 ttl=63 time=55.506 ms
+        64 bytes from 51.250.51.8: seq=3 ttl=63 time=60.929 ms
+        64 bytes from 51.250.51.8: seq=4 ttl=63 time=60.669 ms
+        64 bytes from 51.250.51.8: seq=5 ttl=63 time=55.469 ms
+        64 bytes from 51.250.51.8: seq=6 ttl=63 time=56.548 ms
+
+        --- netology.ru ping statistics ---
+        7 packets transmitted, 7 packets received, 0% packet loss
+        round-trip min/avg/max = 55.469/57.966/61.135 ms
+
+6-  docker ps -a
+        CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS                      PORTS     NAMES
+        269ea743513b   busybox   "ping -c 7 netology.…"   13 minutes ago   Exited (0) 18 seconds ago             pinger
+
+7-  docker logs pinger
+        PING netology.ru (51.250.51.8): 56 data bytes
+        64 bytes from 51.250.51.8: seq=0 ttl=63 time=58.363 ms
+        64 bytes from 51.250.51.8: seq=1 ttl=63 time=58.049 ms
+        64 bytes from 51.250.51.8: seq=2 ttl=63 time=62.162 ms
+        64 bytes from 51.250.51.8: seq=3 ttl=63 time=61.933 ms
+        64 bytes from 51.250.51.8: seq=4 ttl=63 time=61.641 ms
+        64 bytes from 51.250.51.8: seq=5 ttl=63 time=57.719 ms
+        64 bytes from 51.250.51.8: seq=6 ttl=63 time=61.537 ms
+
+        --- netology.ru ping statistics ---
+        7 packets transmitted, 7 packets received, 0% packet loss
+        round-trip min/avg/max = 57.719/60.200/62.162 ms
+        PING netology.ru (51.250.51.8): 56 data bytes
+        64 bytes from 51.250.51.8: seq=0 ttl=63 time=55.508 ms
+        64 bytes from 51.250.51.8: seq=1 ttl=63 time=61.135 ms
+        64 bytes from 51.250.51.8: seq=2 ttl=63 time=55.506 ms
+        64 bytes from 51.250.51.8: seq=3 ttl=63 time=60.929 ms
+        64 bytes from 51.250.51.8: seq=4 ttl=63 time=60.669 ms
+        64 bytes from 51.250.51.8: seq=5 ttl=63 time=55.469 ms
+        64 bytes from 51.250.51.8: seq=6 ttl=63 time=56.548 ms
+
+        --- netology.ru ping statistics ---
+        7 packets transmitted, 7 packets received, 0% packet loss
+        round-trip min/avg/max = 55.469/57.966/61.135 ms
+
+8-  docker logs pinger | Select-String "PING netology.ru" | Measure-Object | Select-Object -ExpandProperty Count
+        2
+    docker logs pinger | Select-String "packets transmitted" | ForEach-Object { $_ -match '(\d+) packets transmitted' | Out-Null; $matches[1] } | Measure-Object -Sum | Select-Object -ExpandProperty Sum
+        14
+9-  docker rm -f pinger
+        pinger
+10- docker rmi -f busybox
+        Untagged: busybox:latest
+        Deleted: sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
