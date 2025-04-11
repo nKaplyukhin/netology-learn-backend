@@ -15,6 +15,9 @@
     <p class="card-text">
       Имя файла-<%=book.fileName%>
     </p>
+    <p class="card-text">
+      количество просмотров книги-<%=count%>
+    </p>
     <div class="mt-auto">
       <a href="/books/<%=book.id%>/download" class="btn btn-primary <%=!book.fileName && "disabled" %>">Скачать</a>
       <a href="/books/edit/<%=book.id%>" class="btn btn-success">Редактировать</a>

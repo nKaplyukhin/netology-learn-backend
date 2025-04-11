@@ -3,6 +3,9 @@ const uploadFile = require("../middlewares/upload-book");
 const fs = require("fs");
 const { booksFilePath } = require("../common");
 const { v4: uuidv4 } = require("uuid");
+const axios = require('axios');
+
+const COUNTER_APP_URL = process.env.COUNTER_APP_URL || "http://counter:5001"
 
 const router = express.Router();
 
@@ -47,7 +50,7 @@ router.get("/", (req, res) => {
   res.render('index', { title: 'Главная', books });
 });
 
-router.get("/info/:id", (req, res) => {
+router.get("/info/:id", async (req, res) => {
   const { books } = stor;
   const { id } = req.params;
 
@@ -58,7 +61,19 @@ router.get("/info/:id", (req, res) => {
     return
   }
 
-  res.render("book-view", { title: book.title, book });
+  try {
+    await axios.post(`${COUNTER_APP_URL}/counter/${id}/incr`);
+
+    const response = await axios.get(`${COUNTER_APP_URL}/counter/${id}`);
+    const { count } = response.data;
+
+    res.render("book-view", { title: book.title, book, count });
+  } catch (err) {
+    
+    console.log(err);
+    res.status(500).send('Произошла ошибка');
+  }
+
 });
 
 
