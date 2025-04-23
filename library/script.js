@@ -1,11 +1,14 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const { bookRouter } = require("./routes/book");
 const error404 = require("./middlewares/error-404");
 const { isNotDefined } = require("./common");
 
 const app = express();
 const port = process.env.PORT || 5000;
-app.set('view engine', 'ejs');
+const MONGODB_URL = process.env.MONGODB_URL || "mongodb://localhost:27017/books "
+
+app.use(express.json());
 
 const stor = {
   users: [
@@ -17,7 +20,7 @@ const stor = {
 };
 
 app.use(express.urlencoded({ extended: true }));
-app.use("/books", bookRouter);
+app.use("/api/books", bookRouter);
 
 app.post("/api/user/login", (req, res) => {
   const { login, password } = req.body;
@@ -40,6 +43,15 @@ app.post("/api/user/login", (req, res) => {
 
 app.use(error404);
 
-app.listen(port, () => {
-  console.log(`Server start on ${port} port`);
-});
+const start = async () => {
+  try {
+    await mongoose.connect(MONGODB_URL)
+    app.listen(port, () => {
+      console.log(`Server start on ${port} port`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+start()
