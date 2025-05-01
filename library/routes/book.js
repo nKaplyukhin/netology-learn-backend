@@ -1,6 +1,5 @@
 const express = require("express");
 const uploadFile = require("../middlewares/upload-book");
-const fs = require("fs");
 const { booksFilePath } = require("../common");
 const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
