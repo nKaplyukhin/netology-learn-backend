@@ -4,59 +4,27 @@ const fs = require("fs");
 const { booksFilePath } = require("../common");
 const { v4: uuidv4 } = require("uuid");
 const axios = require('axios');
+const Book = require("../schemas/book-schema")
 
 const COUNTER_APP_URL = process.env.COUNTER_APP_URL || "http://counter:5001"
 
 const router = express.Router();
 
-class Book {
-  constructor({
-    id = uuidv4(),
-    title = "",
-    descriptrion = "",
-    authors = "",
-    favorite = false,
-    fileCover = "",
-    fileName = "",
-    fileBook = "",
-  }) {
-    this.id = id;
-    this.title = title;
-    this.descriptrion = descriptrion;
-    this.authors = authors;
-    this.favorite = favorite;
-    this.fileCover = fileCover;
-    this.fileName = fileName;
-    this.fileBook = fileBook;
-  }
-}
+router.get("/", async (req, res) => {
 
-const stor = {
-  books: [
-    new Book({
-      title: "book1",
-      fileName: "1742101789791-book.json",
-      favorite: true
-    }),
-    new Book({
-      title: "book2",
-    }),
-  ],
-};
-
-router.get("/", (req, res) => {
-  const { books } = stor;
+  const books = await Book.find().select(
+    "-__v"
+  )
 
   res.render('index', { title: 'Главная', books });
 });
 
 router.get("/info/:id", async (req, res) => {
-  const { books } = stor;
   const { id } = req.params;
 
-  const book = books.find((item) => item.id === id);
+  const newBook = await Book.findById(id).select("-__v")
 
-  if (!book) {
+  if (!newBook) {
     res.status(404).render("error", { title: "Ошибка" });
     return
   }
@@ -67,74 +35,63 @@ router.get("/info/:id", async (req, res) => {
     const response = await axios.get(`${COUNTER_APP_URL}/counter/${id}`);
     const { count } = response.data;
 
-    res.render("book-view", { title: book.title, book, count });
+    res.render("book-view", { title: newBook.title, newBook, count });
   } catch (err) {
-    
+
     console.log(err);
     res.status(500).send('Произошла ошибка');
   }
 
 });
 
-
-router.get("/edit/:id", (req, res) => {
-  const { books } = stor;
+router.get("/edit/:id", async (req, res) => {
   const { id } = req.params;
 
-  const book = books.find((item) => item.id === id);
+  const newBook = await Book.findById(id).select("-__v")
 
-  if (!book) {
+  if (!newBook) {
     res.status(404).render("error", { title: "Ошибка" });
     return
   }
 
-  res.render("book-edit", { title: 'Редактирование', book });
+  res.render("book-edit", { title: 'Редактирование', newBook });
 });
 
-router.post("/edit/:id", (req, res) => {
-  const { id } = req.params;
-  const { books } = stor;
+router.post("/edit/:id", async (req, res) => {
   const params = req.body;
 
-  const idx = books.findIndex((item) => item.id === id);
-
-  if (idx === -1) {
-    res.status(404).render("error", { title: "Ошибка" });
-    return
-  }
-
-  books[idx] = { ...books[idx], ...params, favorite: !!params.favorite || false };
+  const newBook = await Book.findByIdAndUpdate(id, params);
 
   res.status(201);
-  res.redirect(`/books/info/${books[idx].id}`)
+  res.redirect(`/books/info/${newBook.id}`)
 });
 
-router.get("/:id/download", (req, res) => {
-  const { id } = req.params;
-  const { books } = stor;
+// router.get("/:id/download", (req, res) => {
+//   const { id } = req.params;
+//   const { books } = stor;
 
-  const book = books.find((item) => item.id === id);
+//   const book = books.find((item) => item.id === id);
 
-  if (!book) {
-    res.status(404).render("error", { title: "Ошибка" });
-    return
-  }
+//   if (!book) {
+//     res.status(404).render("error", { title: "Ошибка" });
+//     return
+//   }
 
-  const { fileName } = book;
+//   const { fileName } = book;
 
-  res.download(booksFilePath + "/" + fileName, fileName, (err) => {
-    if (err) {
-      res.status(404).json(err);
-    }
-  });
-});
+//   res.download(booksFilePath + "/" + fileName, fileName, (err) => {
+//     if (err) {
+//       res.status(404).json(err);
+//     }
+//   });
+// });
 
-router.post("/create", (req, res) => {
+router.post("/create", async (req, res) => {
   const params = req.body;
-  const newBook = new Book({ ...params, favorite: !!params.favorite || false });
+  const newBook = new Book(params);
 
   res.status(201);
-  stor.books.push(newBook);
+  await newBook.save()
   res.redirect("/books")
 });
 
@@ -142,43 +99,40 @@ router.get("/create", (req, res) => {
   res.render('book-create', { title: 'Главная', book: {} });
 });
 
-router.post("/upload", uploadFile.single("book"), (req, res) => {
+// router.post("/upload", uploadFile.single("book"), (req, res) => {
 
-  if (req.file) {
-    const { filename, path, } = req.file;
+//   if (req.file) {
+//     const { filename, path, } = req.file;
 
-    const buffer = fs.readFileSync(path);
+//     const buffer = fs.readFileSync(path);
 
-    if (buffer) {
-      const bookData = JSON.parse(buffer);
-      const newBook = new Book({ ...bookData, fileName: filename, fileBook: path });
+//     if (buffer) {
+//       const bookData = JSON.parse(buffer);
+//       const newBook = new Book({ ...bookData, fileName: filename, fileBook: path });
 
-      stor.books.push(newBook);
+//       stor.books.push(newBook);
 
-      res.status(201).redirect("/books");
-      return;
-    }
-  }
-  res.status(404).render("error", { title: "Ошибка" });
-});
+//       res.status(201).redirect("/books");
+//       return;
+//     }
+//   }
+//   res.status(404).render("error", { title: "Ошибка" });
+// });
 
 router.get("/upload", uploadFile.single("book"), (req, res) => {
 
   res.render('book-upload', { title: 'Главная', book: {} });
 });
 
-router.post("/delete/:id", (req, res) => {
+router.post("/delete/:id", async (req, res) => {
   const { id } = req.params;
-  const { books } = stor;
 
-  const idx = books.findIndex((item) => item.id === id);
+  await Book.deleteOne({ _id: id });
 
   if (idx === -1) {
     res.status(404).render("error", { title: "Ошибка" });
     return
   }
-
-  books.splice(idx, 1);
 
   res.redirect("/books")
 });
