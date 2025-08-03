@@ -1,0 +1,32 @@
+{
+  "name": "netology-learn-backend",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "start": "node -r dotenv/config script.js",
+    "dev": "nodemon -r dotenv/config --ignore public script.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nKaplyukhin/netology-learn-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nKaplyukhin/netology-learn-backend/issues"
+  },
+  "homepage": "https://github.com/nKaplyukhin/netology-learn-backend#readme",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9"
+  }
+}
