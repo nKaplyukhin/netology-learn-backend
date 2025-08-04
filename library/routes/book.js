@@ -75,25 +75,23 @@ router.post("/edit/:id", async (req, res) => {
 
 });
 
-// router.get("/:id/download", (req, res) => {
-//   const { id } = req.params;
-//   const { books } = stor;
+router.get("/:id/download", async (req, res) => {
+  const { id } = req.params;
+  const newBook = await Book.findById(id).select("-__v")
 
-//   const book = books.find((item) => item.id === id);
+  if (!newBook) {
+    isNotDefined(res)
+    return
+  }
 
-//   if (!book) {
-//     res.status(404).render("error", { title: "Ошибка" });
-//     return
-//   }
+  const { fileName } = newBook;
 
-//   const { fileName } = book;
-
-//   res.download(booksFilePath + "/" + fileName, fileName, (err) => {
-//     if (err) {
-//       res.status(404).json(err);
-//     }
-//   });
-// });
+  res.download(booksFilePath + "/" + fileName, fileName, (err) => {
+    if (err) {
+      res.status(404).json(err);
+    }
+  });
+});
 
 router.post("/create", async (req, res) => {
   const params = req.body;
@@ -113,25 +111,29 @@ router.get("/create", (req, res) => {
   res.render('book-create', { title: 'Главная', book: {} });
 });
 
-// router.post("/upload", uploadFile.single("book"), (req, res) => {
+router.post("/upload", uploadFile.single("book"), async (req, res) => {
 
-//   if (req.file) {
-//     const { filename, path, } = req.file;
+  if (req.file) {
+    const { filename, path, } = req.file;
+    const buffer = fs.readFileSync(path);
 
-//     const buffer = fs.readFileSync(path);
+    if (buffer) {
+      try {
+        const bookData = JSON.parse(buffer);
+        const newBook = new Book({ ...bookData, fileName: filename, fileBook: path });
 
-//     if (buffer) {
-//       const bookData = JSON.parse(buffer);
-//       const newBook = new Book({ ...bookData, fileName: filename, fileBook: path });
+        res.status(201);
+        await newBook.save()
+        res.redirect("/books")
+      } catch (error) {
+        res.status(404).render("error", { title: "Ошибка" });
+      }
 
-//       stor.books.push(newBook);
-
-//       res.status(201).redirect("/books");
-//       return;
-//     }
-//   }
-//   res.status(404).render("error", { title: "Ошибка" });
-// });
+      return;
+    }
+  }
+  res.status(404).render("error", { title: "Ошибка" });
+});
 
 router.get("/upload", uploadFile.single("book"), (req, res) => {
 

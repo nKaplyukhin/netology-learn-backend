@@ -1,0 +1,55 @@
+<div>
+  <h2 class="card-title">Комментарии</h2>
+  <ul class="list-group comments-list">
+  </ul>
+  <h4 class="card-title">Добавить комментарий</h4>
+  <form
+    id="comment-form"
+  >
+    <label for="authors">Автор</label>
+    <input
+      id="author"
+      type="text"
+      name="author"
+      class="form-control"
+    >
+    <label for="comment">Комментарий</label>
+    <textarea
+      id="comment"
+      name="comment"
+      class="form-control"
+    ></textarea>
+    <button
+      class="btn btn-primary"
+      type="submit"
+    >Добавить</button>
+  </form>
+</div>
+<script defer>
+        const roomName = location.pathname.split("/").pop()
+
+        const socket = io({ query: { roomName } });
+
+        document.getElementById('comment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const author = document.getElementById('author').value;
+            const comment = document.getElementById('comment').value;
+
+            socket.emit('newComment', { author, comment, roomName });
+
+            document.getElementById('comment-form').reset();
+        });
+
+        socket.on('commentAdded', (data) => {
+            const commentsContainer = document.querySelector('.comments-list');
+
+            const commentElement = document.createElement('li');
+            commentElement.className = 'list-group-item';
+
+            commentElement.innerHTML = `
+            <h5 class="card-title">${data.author}</h5>
+            <p class="card-text">${data.comment}</p>
+            `;
+            commentsContainer.appendChild(commentElement);
+        });
+</script>
