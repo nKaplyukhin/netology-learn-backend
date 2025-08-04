@@ -21,16 +21,12 @@ app.use(error404);
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Присоединяемся к комнате, которая соответствует текущей странице
   const { roomName } = socket.handshake.query;
   if (roomName) {
     socket.join(roomName);
     console.log(`User joined room: ${roomName}`);
 
     socket.on('newComment', (commentData) => {
-      // Рассылаем новое сообщение только в комнату текущей страницы
-      console.log(commentData);
-
       io.to(commentData.roomName).emit('commentAdded', commentData);
     });
   }
